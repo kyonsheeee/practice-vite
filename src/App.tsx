@@ -1,4 +1,6 @@
 import { Form } from "antd";
+import { useEffect, useState } from "react";
+import { GuessesComponent } from "./GuessesComponent";
 import {
   StyledButton,
   StyledCard,
@@ -7,11 +9,26 @@ import {
   StyledInput,
 } from "./Styled";
 import { generateAnswer } from "./generateAnswer";
-import { useEffect, useState } from "react";
+import type { Guesses } from "./types";
+
+const calcResult = (
+  answer: string[],
+  idx: number,
+  value: string
+): "HIT" | "BLOW" | "MISS" => {
+  if (answer[idx] === value) {
+    return "HIT";
+  }
+  if (answer.includes(value)) {
+    return "BLOW";
+  }
+  return "MISS";
+};
 
 const App = () => {
   const [form] = Form.useForm();
   const [answer, setAnswer] = useState<string[]>([]);
+  const [history, setHistory] = useState<Guesses[]>([]);
 
   useEffect(() => {
     setAnswer(generateAnswer());
@@ -20,13 +37,26 @@ const App = () => {
   const onFinish = async (value: { inputNumber: string }) => {
     await form.validateFields();
     // console.log("onFinish");
+
+    const guesses = Array.from(value.inputNumber).map((item, index) => {
+      return {
+        index,
+        value: item,
+        result: calcResult(answer, index, item),
+      };
+    });
+    setHistory([...history, { index: history.length, guesses }]);
   };
 
   return (
     <>
       <StyledCard>
         <Form onFinish={onFinish}>
-          {}
+          {history.map((guesses) => (
+            <GuessesComponent
+              key={guesses.index} guesses={guesses.guesses}
+            ></GuessesComponent>
+          ))}
           <StyledFormItem
             name="inputNumber"
             rules={[
