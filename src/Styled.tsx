@@ -9,7 +9,7 @@ export const StyledCard = styled(Card)`
   width: 480px;
   margin: 0 auto;
   margin-top: 100px;
-  background-color: #2E3553;
+  background-color: #2e3553;
 `;
 
 export const StyledInput = styled(Input)`
@@ -29,4 +29,4 @@ export const StyledDiv = styled.div`
   background-color: ${({ color }) => color};
   color: white;
   margin-top: 8px;
-`
+`;
