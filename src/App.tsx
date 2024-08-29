@@ -6,20 +6,29 @@ import {
   StyledFormItem,
   StyledInput,
 } from "./Styled";
+import { generateAnswer } from "./generateAnswer";
+import { useEffect, useState } from "react";
 
 const App = () => {
   const [form] = Form.useForm();
-  const onFinish = async () => {
+  const [answer, setAnswer] = useState<string[]>([]);
+
+  useEffect(() => {
+    setAnswer(generateAnswer());
+  }, []);
+
+  const onFinish = async (value: { inputNumber: string }) => {
     await form.validateFields();
-    console.log("onFinish");
+    // console.log("onFinish");
   };
 
   return (
     <>
       <StyledCard>
         <Form onFinish={onFinish}>
+          {}
           <StyledFormItem
-            name="4digit number"
+            name="inputNumber"
             rules={[
               { required: true, message: "input: [0000-9999]" },
               {
@@ -27,7 +36,7 @@ const App = () => {
                 message: "input: [0000-9999]",
               },
             ]}
-            validateTrigger="submit"
+            validateTrigger="onSubmit"
           >
             <StyledInput placeholder="Enter 4-digit number" />
           </StyledFormItem>
