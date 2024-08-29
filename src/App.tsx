@@ -1,35 +1,114 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Form } from "antd";
+import { useEffect, useState } from "react";
+import { GuessesComponent } from "./components/GuessesComponent";
+import {
+  Description,
+  StyledButton,
+  StyledCard,
+  StyledFormItem,
+  StyledInput,
+} from "./components/Styled";
+import { generateAnswer } from "./generateAnswer";
+import type { Guesses } from "./types";
 
-function App() {
-  const [count, setCount] = useState(0)
+const calcResult = (
+  answer: string[],
+  idx: number,
+  value: string
+): "HIT" | "BLOW" | "MISS" => {
+  if (answer[idx] === value) {
+    return "HIT";
+  }
+  if (answer.includes(value)) {
+    return "BLOW";
+  }
+  return "MISS";
+};
+
+const App = () => {
+  const [form] = Form.useForm();
+  const [answer, setAnswer] = useState<string[]>([]);
+  const [history, setHistory] = useState<Guesses[]>([]);
+  const [finish, setFinish] = useState<boolean>(false);
+
+  useEffect(() => {
+    setAnswer(generateAnswer());
+  }, []);
+
+  const onFinish = async (value: { inputNumber: string }) => {
+    await form.validateFields();
+    // console.log("onFinish");
+
+    if (finish) {
+      setAnswer(generateAnswer());
+      setHistory([]);
+      setFinish(false);
+      form.resetFields();
+      return;
+    }
+
+    const guesses = Array.from(value.inputNumber).map((item, index) => {
+      return {
+        index,
+        value: item,
+        result: calcResult(answer, index, item),
+      };
+    });
+
+    const newHistory = history.concat({ index: history.length, guesses });
+    setHistory(newHistory);
+
+    // Clear!
+    if (guesses.every((guess) => guess.result === "HIT")) {
+      setFinish(true);
+    }
+
+    // Game over
+    if (newHistory.length >= 5) {
+      setFinish(true);
+    }
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <StyledCard>
+        <Form onFinish={onFinish}>
+          {history.map((guesses) => (
+            <GuessesComponent
+              key={guesses.index} guesses={guesses.guesses}
+            ></GuessesComponent>
+          ))}
+          <StyledFormItem
+            name="inputNumber"
+            rules={[
+              { required: true, message: "input: [0000-9999]" },
+              {
+                pattern: /^[0-9]{4}$/,
+                message: "input: [0000-9999]",
+              },
+            ]}
+            validateTrigger="onSubmit"
+          >
+            <StyledInput placeholder="Enter 4-digit number" />
+          </StyledFormItem>
+          <StyledFormItem>
+            <StyledButton type="primary" htmlType="submit">
+              {finish ? "Try again" : "Done"}
+            </StyledButton>
+          </StyledFormItem>
+        </Form>
+        <Description color="#377e22">
+          The position and the number are correct
+        </Description>
+        <Description color="#958129">
+          Only the position of the number is wrong
+        </Description>
+        <Description color="#5c0e09">
+          Both the position and the number are wrong
+        </Description>
+      </StyledCard>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
