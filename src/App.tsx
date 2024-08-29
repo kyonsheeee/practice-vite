@@ -1,6 +1,7 @@
 import { Form } from "antd";
 import { useEffect, useState } from "react";
 import { GuessesComponent } from "./components/GuessesComponent";
+import { RuleComponent } from "./components/Rules";
 import {
   Description,
   StyledButton,
@@ -107,6 +108,7 @@ const App = () => {
           Both the position and the number are wrong
         </Description>
       </StyledCard>
+      <RuleComponent />
     </>
   );
 };
