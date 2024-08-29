@@ -2,6 +2,7 @@ import { Form } from "antd";
 import { useEffect, useState } from "react";
 import { GuessesComponent } from "./components/GuessesComponent";
 import { RuleComponent } from "./components/Rules";
+import { RuleComponent } from "./components/Rules";
 import {
   Description,
   StyledButton,
@@ -106,6 +107,7 @@ const App = () => {
         </Description>
         <Description color="#5c0e09">
           Both the position and the number are wrong
+      <RuleComponent />
         </Description>
       </StyledCard>
       <RuleComponent />
