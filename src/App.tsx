@@ -1,5 +1,5 @@
 import { Form } from "antd";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { GuessesComponent } from "./components/GuessesComponent";
 import { RuleComponent } from "./components/Rules";
 import {
@@ -15,7 +15,7 @@ import type { Guesses } from "./types";
 const calcResult = (
   answer: string[],
   idx: number,
-  value: string,
+  value: string
 ): "HIT" | "BLOW" | "MISS" => {
   if (answer[idx] === value) {
     return "HIT";
@@ -29,20 +29,21 @@ const calcResult = (
 const App = () => {
   const [form] = Form.useForm();
   const [history, setHistory] = useState<Guesses[]>([]);
-  const [finish, setFinish] = useState<boolean>(false);
+  const [gameOver, setGameOver] = useState<boolean>(false);
   const [answer, resetAnswer] = useAnswer();
 
   const onFinish = async (value: { inputNumber: string }) => {
-    await form.validateFields();
     // console.log("onFinish");
 
-    if (finish) {
+    if (gameOver) {
       resetAnswer();
       setHistory([]);
-      setFinish(false);
+      setGameOver(false);
       form.resetFields();
       return;
     }
+
+    await form.validateFields();
 
     const guesses = Array.from(value.inputNumber).map((item, index) => {
       return {
@@ -56,13 +57,11 @@ const App = () => {
     setHistory(newHistory);
 
     // Clear!
-    if (guesses.every((guess) => guess.result === "HIT")) {
-      setFinish(true);
-    }
-
-    // Game over
-    if (newHistory.length >= 5) {
-      setFinish(true);
+    if (
+      guesses.every((guess) => guess.result === "HIT") ||
+      newHistory.length >= 5
+    ) {
+      setGameOver(true);
     }
   };
 
@@ -72,7 +71,8 @@ const App = () => {
         <Form onFinish={onFinish}>
           {history.map((guesses) => (
             <GuessesComponent
-              key={guesses.index} guesses={guesses.guesses}
+              key={guesses.index}
+              guesses={guesses.guesses}
             ></GuessesComponent>
           ))}
           <StyledFormItem
@@ -90,7 +90,7 @@ const App = () => {
           </StyledFormItem>
           <StyledFormItem>
             <StyledButton type="primary" htmlType="submit">
-              {finish ? "Try again" : "Done"}
+              {gameOver ? "Try again" : "Done"}
             </StyledButton>
           </StyledFormItem>
         </Form>
