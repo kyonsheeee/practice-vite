@@ -9,13 +9,13 @@ import {
   StyledFormItem,
   StyledInput,
 } from "./components/Styled";
-import { generateAnswer } from "./generateAnswer";
+import { useAnswer } from "./hooks/useAnswer";
 import type { Guesses } from "./types";
 
 const calcResult = (
   answer: string[],
   idx: number,
-  value: string
+  value: string,
 ): "HIT" | "BLOW" | "MISS" => {
   if (answer[idx] === value) {
     return "HIT";
@@ -28,20 +28,16 @@ const calcResult = (
 
 const App = () => {
   const [form] = Form.useForm();
-  const [answer, setAnswer] = useState<string[]>([]);
   const [history, setHistory] = useState<Guesses[]>([]);
   const [finish, setFinish] = useState<boolean>(false);
-
-  useEffect(() => {
-    setAnswer(generateAnswer());
-  }, []);
+  const [answer, resetAnswer] = useAnswer();
 
   const onFinish = async (value: { inputNumber: string }) => {
     await form.validateFields();
     // console.log("onFinish");
 
     if (finish) {
-      setAnswer(generateAnswer());
+      resetAnswer();
       setHistory([]);
       setFinish(false);
       form.resetFields();
