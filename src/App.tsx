@@ -11,6 +11,7 @@ import {
 } from "./components/Styled";
 import { useAnswer } from "./hooks/useAnswer";
 import type { Guesses } from "./types";
+import { BLOW_COLOR, HIT_COLOR, MISS_COLOR } from "./color";
 
 const calcResult = (
   answer: string[],
@@ -94,13 +95,13 @@ const App = () => {
             </StyledButton>
           </StyledFormItem>
         </Form>
-        <Description color="#377e22">
+        <Description color={HIT_COLOR}>
           The position and the number are correct
         </Description>
-        <Description color="#958129">
+        <Description color={BLOW_COLOR}>
           Only the position of the number is wrong
         </Description>
-        <Description color="#5c0e09">
+        <Description color={MISS_COLOR}>
           Both the position and the number are wrong
         </Description>
       </StyledCard>

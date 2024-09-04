@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import type { Guess } from "../types";
+import { BLOW_COLOR, HIT_COLOR, MISS_COLOR } from "../color";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -27,10 +28,10 @@ export const GuessesComponent = ({ guesses }: Props) => {
           key={guess.index}
           color={
             guess.result === "HIT"
-              ? "#377e22"
+              ? HIT_COLOR
               : guess.result === "BLOW"
-              ? "#958129"
-              : "5c0e09"
+              ? BLOW_COLOR
+              : MISS_COLOR
           }
         >
           {guess.value}
