@@ -10,26 +10,13 @@ import {
   StyledInput,
 } from "./components/Styled";
 import { useAnswer } from "./hooks/useAnswer";
-import type { Guesses } from "./types";
+import type { GuessesInterface } from "./types";
 import { BLOW_COLOR, HIT_COLOR, MISS_COLOR } from "./color";
-
-const calcResult = (
-  answer: string[],
-  idx: number,
-  value: string
-): "HIT" | "BLOW" | "MISS" => {
-  if (answer[idx] === value) {
-    return "HIT";
-  }
-  if (answer.includes(value)) {
-    return "BLOW";
-  }
-  return "MISS";
-};
+import { generateGuess, isGameOver } from "./guess";
 
 const App = () => {
   const [form] = Form.useForm();
-  const [history, setHistory] = useState<Guesses[]>([]);
+  const [history, setHistory] = useState<GuessesInterface[]>([]);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [answer, resetAnswer] = useAnswer();
 
@@ -46,22 +33,12 @@ const App = () => {
 
     await form.validateFields();
 
-    const guesses = Array.from(value.inputNumber).map((item, index) => {
-      return {
-        index,
-        value: item,
-        result: calcResult(answer, index, item),
-      };
-    });
-
+    const guesses = generateGuess(value.inputNumber, answer);
     const newHistory = history.concat({ index: history.length, guesses });
     setHistory(newHistory);
 
     // Clear!
-    if (
-      guesses.every((guess) => guess.result === "HIT") ||
-      newHistory.length >= 5
-    ) {
+    if (isGameOver(guesses, newHistory)) {
       setGameOver(true);
     }
   };
@@ -79,16 +56,18 @@ const App = () => {
           <StyledFormItem
             name="inputNumber"
             rules={[
-              { validator: async (_, value) => {
-                if (gameOver) return Promise.resolve();
-                if (!value) {
-                  throw new Error("This field is required.");
-                }
-                if (!/^[0-9]{4}$/.test(value)) {
-                  throw new Error("input: [0000-9999]")
-                }
-                return Promise.resolve();
-              }},
+              {
+                validator: async (_, value) => {
+                  if (gameOver) return Promise.resolve();
+                  if (!value) {
+                    throw new Error("This field is required.");
+                  }
+                  if (!/^[0-9]{4}$/.test(value)) {
+                    throw new Error("input: [0000-9999]");
+                  }
+                  return Promise.resolve();
+                },
+              },
             ]}
             validateTrigger="onSubmit"
           >

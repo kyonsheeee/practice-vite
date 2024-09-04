@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import type { Guess } from "../types";
+import type { GuessInterface } from "../types";
 import { BLOW_COLOR, HIT_COLOR, MISS_COLOR } from "../color";
 
 const StyledDiv = styled.div`
@@ -17,7 +17,7 @@ const StyledBox = styled.div`
 `;
 
 interface Props {
-  guesses: Guess[];
+  guesses: GuessInterface[];
 }
 
 export const GuessesComponent = ({ guesses }: Props) => {
